@@ -1,0 +1,9 @@
+DROP TABLE IF EXISTS seats;
+DROP TABLE IF EXISTS boarding_passes;
+DROP TABLE IF EXISTS ticket_flights;
+DROP TABLE IF EXISTS flights;
+DROP TABLE IF EXISTS tickets;
+DROP TABLE IF EXISTS bookings;
+DROP TABLE IF EXISTS aircrafts;
+DROP TABLE IF EXISTS airports;
+DROP TYPE IF EXISTS statuses;
