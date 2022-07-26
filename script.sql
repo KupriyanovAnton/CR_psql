@@ -1,13 +1,3 @@
-DROP TABLE IF EXISTS seats;
-DROP TABLE IF EXISTS boarding_passes;
-DROP TABLE IF EXISTS ticket_flights;
-DROP TABLE IF EXISTS flights;
-DROP TABLE IF EXISTS tickets;
-DROP TABLE IF EXISTS bookings;
-DROP TABLE IF EXISTS aircrafts;
-DROP TABLE IF EXISTS airports;
-DROP TYPE IF EXISTS statuses;
-
 CREATE TYPE statuses AS ENUM ('expected', 'prepared', 'arrived');
 CREATE TABLE airports(airport_code varchar(4) PRIMARY KEY, airport_name varchar(20) NOT NULL, sity varchar(20) NOT NULL, coordinates integer NOT NULL, timezone timestamp NOT NULL);
 CREATE TABLE aircrafts(aircraft_code varchar(4) PRIMARY KEY, model varchar(6) NOT NULL, range smallint NOT NULL);
