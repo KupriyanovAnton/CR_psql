@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS airports_data(
 	timezone		text NOT NULL
 );
 
-CREATE VIEW airports AS
+CREATE OR REPLACE VIEW airports AS
 	SELECT 
 		ml.airport_code,
 		ml.airport_name ->> lang() AS airport_name,
