@@ -24,4 +24,13 @@ SELECT
 FROM
 	flights
 WHERE
-	 (scheduled_arrival-scheduled_departure) > interval '8 hours'
+	 (scheduled_arrival-scheduled_departure) > interval '8 hours';
+
+SELECT
+	passenger_name,
+	array_agg(contact_data->>'phone') nums
+FROM
+	tickets
+WHERE
+	contact_data->>'phone' IS not NULL
+GROUP BY passenger_name
