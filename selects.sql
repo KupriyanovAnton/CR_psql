@@ -38,5 +38,16 @@ GROUP BY passenger_name;
 SELECT
 	COUNT(DISTINCT passenger_name) num_passengers
 FROM
-	tickets
+	tickets;
+	
+SELECT
+	a.model,
+	COALESCE(s.num_seats, 0) num_seats 
+FROM Aircrafts a
+	LEFT JOIN (SELECT
+			aircraft_code,
+			COUNT( DISTINCT seat_no) num_seats
+		FROM
+			seats
+		GROUP BY aircraft_code) s USING(aircraft_code)
 
