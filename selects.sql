@@ -13,4 +13,15 @@ SELECT
 FROM
 	airports_data
 WHERE
-	circle '<(37.617222, 55.755833), 1>' @> coordinates
+	circle '<(37.617222, 55.755833), 1>' @> coordinates;
+	
+SELECT
+	flight_no,
+	concat(departure_airport, '->', arrival_airport) as route,
+	format('%s hours, %s mins', 
+		(EXTRACT(epoch from scheduled_arrival-scheduled_departure)/3600)::int, 
+		EXTRACT(minute from scheduled_arrival-scheduled_departure)) as duration
+FROM
+	flights
+WHERE
+	 (scheduled_arrival-scheduled_departure) > interval '8 hours'
