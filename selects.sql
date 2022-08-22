@@ -28,9 +28,15 @@ WHERE
 
 SELECT
 	passenger_name,
-	array_agg(contact_data->>'phone') nums
+	array_agg(contact_data->>'phone') phones_arr
 FROM
 	tickets
 WHERE
 	contact_data->>'phone' IS not NULL
-GROUP BY passenger_name
+GROUP BY passenger_name;
+
+SELECT
+	COUNT(DISTINCT passenger_name) num_passengers
+FROM
+	tickets
+
