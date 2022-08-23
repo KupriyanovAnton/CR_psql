@@ -13,4 +13,13 @@ WHERE flight_id IN
 					AND date_trunc('day', scheduled_departure) = timestamptz '2017-07-16')
 ORDER BY
 	LENGTH(bp.seat_no),
-	bp.seat_no
+	bp.seat_no;
+SELECT
+	tc.passenger_name, 
+	fl.flight_no 
+FROM
+	tickets tc 
+	join ticket_flights tf using(ticket_no)
+	join flights fl using(flight_id)
+WHERE
+	book_ref = '3B54BB'
