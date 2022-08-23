@@ -49,5 +49,19 @@ FROM Aircrafts a
 			COUNT( DISTINCT seat_no) num_seats
 		FROM
 			seats
-		GROUP BY aircraft_code) s USING(aircraft_code)
+		GROUP BY aircraft_code) s USING(aircraft_code);
+SELECT
+	a.model,
+	COALESCE(s.fare_conditions, 'unknown') fare_conditions,
+	COALESCE(s.num_seats, 0) num_seats 
+FROM Aircrafts a
+	LEFT JOIN (SELECT
+			aircraft_code,
+			fare_conditions,
+			COUNT( DISTINCT seat_no) num_seats
+		FROM
+			seats
+		GROUP BY aircraft_code, fare_conditions) s USING(aircraft_code)
+ORDER BY
+	a.model, COALESCE(s.fare_conditions, 'unknown')
 
