@@ -15,8 +15,8 @@ ORDER BY
 	LENGTH(bp.seat_no),
 	bp.seat_no;
 SELECT
-	tc.passenger_name, 
-	fl.flight_no 
+	array_to_string(array_agg(DISTINCT tc.passenger_name), ',', 'unknown') passenger_list, 
+	array_to_string(array_agg(DISTINCT fl.flight_no), ',', 'unknown') flight_list
 FROM
 	tickets tc 
 	join ticket_flights tf using(ticket_no)
