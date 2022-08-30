@@ -1,35 +1,39 @@
+-- Вывести всех пассажиров (их фио) и присвоенные им места 
+-- на рейсе 'PG0405', который вылетел 16 июля 2017 года.
 SELECT
 	bp.seat_no,
 	tc.passenger_name
 FROM
 	boarding_passes bp JOIN tickets tc USING (ticket_no)
-WHERE flight_id IN	
- 				(SELECT
-					f.flight_id
-				FROM
-					flights f
-				WHERE
-					flight_no = 'PG0405' 
-					AND date_trunc('day', scheduled_departure) = timestamptz '2017-07-16')
+	JOIN  flights f ON bp.flight_id = f.flight_id
+	
+WHERE 
+	f.flight_no = 'PG0405' 
+	AND actual_departure::date = '2017-07-16'::date
 ORDER BY
 	LENGTH(bp.seat_no),
 	bp.seat_no;
+	
+	
+-- Вывести список пассажиров (их фио) и список рейсов, билеты на которые 
+-- были куплены в бронировании 3B54BB. 
+-- Пример: "DARYA TIKHONOVA,DMITRIY KUZMIN,TATYANA SOROKINA","PG0013,PG0224,PG0703,PG0704”
 SELECT
-	array_to_string(array_agg(DISTINCT tc.passenger_name), ',', 'unknown') passenger_list, 
-	array_to_string(array_agg(DISTINCT fl.flight_no), ',', 'unknown') flight_list
+	string_agg(DISTINCT tc.passenger_name, ',') passenger_list, 
+	string_agg(DISTINCT fl.flight_no, ',') flight_list
 FROM
 	tickets tc 
-	join ticket_flights tf using(ticket_no)
-	join flights fl using(flight_id)
+		join ticket_flights tf using(ticket_no)
+		join flights fl using(flight_id)
 WHERE
 	book_ref = '3B54BB';
 	
 	
--- Перелеты из VKO в CNN
-
+-- Вывести все возможные пути перелетов из Внуково(VKO) в Чульман(CNN), чтобы общая продолжительность 
+-- времени перелета (время от отправления до прибытия, паузы не считаем) было не более 10 часов.
+-- Пример: "{VKO,BZK,SVO,KVX,KZN,MQF,SVX,PEE,CNN}",0 years 0 mons 0 days 9 hours 30 mins 0.0 secs
 with recursive ways(dep, arr, dur) as (
-    
-	select 
+    select 
         departure_airport, 
         arrival_airport, 
         duration, 
