@@ -70,6 +70,35 @@ SELECT set_config('male_names.count', COUNT(*)::text, FALSE) FROM male_first_nam
 SELECT set_config('female_names.count', COUNT(*)::text, FALSE) FROM female_first_names;
 SELECT set_config('middle_names.count', COUNT(*)::text, FALSE) FROM middle_names;
 	
+	
+CREATE OR REPLACE FUNCTION generate_patronymic(isMan BOOLEAN, fName text) RETURNS text AS $$
+	DECLARE
+		except_letters char[] := ARRAY['й', 'ь',  'я'];
+		last_letter char(1) := RIGHT(fName, 1);
+		ending text;
+		result_str text;
+	BEGIN
+		CASE
+			WHEN RIGHT(fName, 1) = ANY(except_letters) THEN
+				IF isMan THEN
+					ending := 'евич';
+				ELSE
+					ending := 'евна';
+				END IF;
+				result_str := SUBSTRING(fName, 1, LENGTH(fName) - 1)||ending;
+			ELSE
+				IF isMan THEN
+					ending := 'ович';
+				ELSE
+					ending := 'овна';
+				END IF;
+				result_str := fName||ending;
+		END CASE;
+		RETURN result_str;
+	END;
+$$ LANGUAGE plpgsql;
+
+	
 CREATE OR REPLACE FUNCTION generate_full_name() RETURNS text AS $$
 	DECLARE
 		isMan BOOLEAN := random() > 0.5;
@@ -77,18 +106,29 @@ CREATE OR REPLACE FUNCTION generate_full_name() RETURNS text AS $$
 		s_n text;
 		t_n text;
 	BEGIN
-		IF isMan THEN SELECT first_name INTO f_n FROM male_first_names LIMIT 1 OFFSET (random()*current_setting('male_names.count')::smallint)
-			ELSE SELECT first_name INTO f_n FROM female_first_names LIMIT 1 OFFSET (random()*current_setting('female_names.count')::smallint)
-		END
-		SELECT middle_name INTO s_n FROM middle_names LIMIT 1 OFFSET (random()*current_setting('middle_names.count')::smallint);
-		SELECT first_name INTO f_n FROM male_first_names LIMIT 1 OFFSET (random()*current_setting('male_names.count')::smallint);
+		IF isMan THEN 
+			SELECT first_name INTO f_n FROM male_first_names LIMIT 1 OFFSET (random()*current_setting('male_names.count')::smallint);
+		ELSE 
+			SELECT first_name INTO f_n FROM female_first_names LIMIT 1 OFFSET (random()*current_setting('female_names.count')::smallint);
+		END IF;
 		
-		RETURN f_n||' '||s_n||' '||t_n;
+		
+		SELECT 
+			(CASE WHEN isMan THEN middle_name ELSE middle_name || 'а' END)
+		INTO 
+			s_n 
+		FROM 
+			middle_names 
+		LIMIT 1 OFFSET (random()*current_setting('middle_names.count')::smallint);
+			
+			
+		SELECT first_name INTO t_n FROM male_first_names LIMIT 1 OFFSET (random()*current_setting('male_names.count')::smallint);
+		
+		RETURN s_n|| ' ' || f_n ||' '||generate_patronymic(isMan, t_n);
+
 	END;
 
 $$ LANGUAGE plpgsql;
 
+
 SELECT generate_full_name()
-
-
-
